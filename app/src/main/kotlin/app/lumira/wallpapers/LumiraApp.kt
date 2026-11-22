@@ -3,6 +3,7 @@ package app.lumira.wallpapers
 import android.app.Application
 import androidx.work.Configuration
 import coil.ImageLoader
+import coil.Coil
 import coil.ImageLoaderFactory
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
@@ -43,7 +44,8 @@ class LumiraApp : Application(), ImageLoaderFactory, Configuration.Provider {
         appScope.launch {
             runCatching {
                 val settings = ServiceLocator.settings(this@LumiraApp).settings.first()
-                imageLoader.diskCache?.maxSizeBytes = settings.cacheLimitMb.toLong() * 1024 * 1024
+                val bytes = settings.cacheLimitMb.toLong() * 1024 * 1024
+                Coil.imageLoader(this@LumiraApp).diskCache?.maxSizeBytes = bytes
             }
         }
     }
