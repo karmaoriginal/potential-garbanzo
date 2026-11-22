@@ -42,9 +42,13 @@ jobs:
             echo '```'
             head -c 4000 /tmp/summary.txt
             echo '```'
+            echo '#### What went wrong'
+            echo '```'
+            grep -E "What went wrong" -A 40 /tmp/full.log | tail -80 || true
+            echo '```'
             echo '#### Errors'
             echo '```'
-            grep -nE "^\S+ (BUILD|FAILURE|e: |error:)|e: file|error:|Caused by|Execution failed|What went wrong|> Task .* FAILED|Could not (resolve|find|GET|download)" \
+            grep -E "^[^ ]+ (e: |error: )|^e: file|^error:|^Caused by|Execution failed|^> Task .* FAILED|Could not (resolve|find|GET|download)|Script compilation errors" \
               /tmp/full.log | tail -120 || true
             echo '```'
             echo '#### Tail'
