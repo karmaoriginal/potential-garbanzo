@@ -67,11 +67,9 @@ class WallpaperRepository(
             val dest = FileStore.mediaFile(context, "$id.$ext")
             FileStore.copyUriToFile(context, uri, dest)
 
-            if (kind == MediaKind.IMAGE) {
-                val oriented = ImageUtils.applyExifRotation(dest, info.rotationDegrees)
-                if (oriented != info.rotationDegrees) {
-                    // rewrite dimensions after rotation
-                }
+            if (kind == MediaKind.IMAGE && info.rotationDegrees != 0) {
+                // Bake EXIF rotation so WallpaperManager/Coil both see it upright.
+                ImageUtils.applyExifRotation(dest, info.rotationDegrees)
             }
 
             val thumb = ImageUtils.createThumbnail(
@@ -81,11 +79,9 @@ class WallpaperRepository(
                 outFile = FileStore.thumbFile(context, "$id.webp"),
             )
 
-            val finalDimensions = if (kind == MediaKind.VIDEO) {
-                MediaProbe.probeFile(dest, mime)
-            } else {
-                ImageUtils.readDimensions(dest)
-            }
+            val probed = MediaProbe.probeFile(dest, mime ?: dest.name)
+            val finalDimensions = probed?.let { it.width to it.height }
+                ?: ImageUtils.readDimensions(dest)
 
             val entity = WallpaperEntity(
                 id = id,
@@ -144,8 +140,8 @@ class WallpaperRepository(
             images = items.count { it.kind == MediaKind.IMAGE.name },
             videos = items.count { it.kind == MediaKind.VIDEO.name },
             bytes = total,
-            cacheBytes = dirSize(FileStore.cacheDir(context)),
-            thumbBytes = dirSize(FileStore.thumbsDir(context)),
+            cacheBytes = FileStore.cacheDir(context).dirSize(),
+            thumbBytes = FileStore.thumbsDir(context).dirSize(),
         )
     }
 
@@ -154,8 +150,8 @@ class WallpaperRepository(
         var freed = 0L
         val cache = FileStore.cacheDir(context)
         val thumbs = FileStore.thumbsDir(context)
-        freed += dirSize(cache)
-        freed += dirSize(thumbs)
+        freed += cache.dirSize()
+        freed += thumbs.dirSize()
         cache.listFiles()?.forEach { it.deleteRecursively() }
         thumbs.listFiles()?.forEach { it.deleteRecursively() }
         // Thumbnails are cheap to regenerate on demand; the UI falls back to placeholders.

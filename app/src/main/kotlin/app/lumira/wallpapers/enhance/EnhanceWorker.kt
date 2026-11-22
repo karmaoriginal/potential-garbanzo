@@ -34,7 +34,7 @@ class EnhanceWorker(
         val notification = Notifications.enhanceProgress(
             context = applicationContext,
             title = inputData.getString(KEY_TITLE) ?: "Mejorando video",
-            progress = 0,
+            progress = 0f,
         )
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             ForegroundInfo(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
@@ -72,7 +72,7 @@ class EnhanceWorker(
         val canceled = AtomicBoolean(false)
 
         repo.setEnhanceState(id, "RUNNING", 0f)
-        val result = try {
+        val result: Result<EnhanceResult> = try {
             VideoEnhancer(applicationContext).enhance(
                 input = input,
                 output = output,

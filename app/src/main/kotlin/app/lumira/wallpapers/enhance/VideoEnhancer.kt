@@ -104,10 +104,11 @@ class VideoEnhancer(private val context: Context) {
             for (command in attempts) {
                 if (cancelFlag.get()) break
                 output.delete()
-                val session: FFmpegSession = FFmpegKit.executeAsync(command) { }
-                // Poll statistics for a smooth progress bar; FFmpegKit reports "-1" until
-                // the duration is known.
-                while (!session.state.isCompleted) {
+                val session: FFmpegSession =
+                    FFmpegKit.executeWithArgumentsAsync(command, null, null, null) { }
+                // FFmpegKit reports the return code only once the session finished; the
+                // statistics callback keeps the progress bar alive meanwhile.
+                while (session.returnCode == null) {
                     if (cancelFlag.get()) {
                         FFmpegKit.cancel(session.sessionId)
                         break

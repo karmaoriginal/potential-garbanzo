@@ -9,6 +9,7 @@ import android.graphics.Matrix
 import android.graphics.Rect
 import android.net.Uri
 import android.os.Build
+import app.lumira.wallpapers.data.wallpaper.WallpaperPrefs
 import app.lumira.wallpapers.domain.model.ApplyTarget
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

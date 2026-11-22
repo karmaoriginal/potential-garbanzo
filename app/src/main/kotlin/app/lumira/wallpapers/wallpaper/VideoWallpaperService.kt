@@ -108,8 +108,6 @@ class VideoWallpaperService : WallpaperService() {
             super.onCreate(holder)
             setOffsetNotificationsEnabled(false)
             setTouchEventsEnabled(false)
-            @Suppress("DEPRECATION")
-            setShowPreview(false)
             surfaceHolder = holder
             screenOn = isScreenOn()
             powerSave = isPowerSaveMode()
