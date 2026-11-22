@@ -63,6 +63,10 @@ fun LibraryScreen(
     viewModel: LibraryViewModel = viewModel(),
 ) {
     val state by viewModel.state.collectAsState()
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val enhanceAvailable = remember(context) {
+        app.lumira.wallpapers.enhance.VideoEnhancer.available(context)
+    }
     var actionTarget by remember { mutableStateOf<Wallpaper?>(null) }
     var renameTarget by remember { mutableStateOf<Wallpaper?>(null) }
     var deleteTarget by remember { mutableStateOf<Wallpaper?>(null) }
@@ -175,7 +179,7 @@ fun LibraryScreen(
                     actionTarget = null
                     renameTarget = target
                 }
-                if (target.kind == MediaKind.VIDEO) {
+                if (target.kind == MediaKind.VIDEO && enhanceAvailable) {
                     SheetAction(Icons.Filled.Edit, "Mejorar calidad (H.265)") {
                         actionTarget = null
                         viewModel.scheduleEnhance(

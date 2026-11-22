@@ -159,6 +159,12 @@ class LibraryViewModel(app: Application) : AndroidViewModel(app) {
 
     fun scheduleEnhance(item: Wallpaper, preset: QualityPreset) = viewModelScope.launch {
         val context: Context = getApplication()
+        if (!app.lumira.wallpapers.enhance.VideoEnhancer.available(context)) {
+            _events.emit(
+                UiEvent.Message("La mejora de video no está disponible en este dispositivo"),
+            )
+            return@launch
+        }
         val settings = ServiceLocator.settings(context).settings.first()
         scheduler.enqueue(item.id, item.title, preset, wifiOnly = false, chargingOnly = true)
         _events.emit(

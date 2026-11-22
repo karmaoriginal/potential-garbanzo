@@ -241,7 +241,9 @@ fun DetailScreen(
                             }
                         }
 
-                        if (item.kind == MediaKind.VIDEO && item.localPath != null) {
+                        if (item.kind == MediaKind.VIDEO && item.localPath != null &&
+                            state.enhanceAvailable
+                        ) {
                             Row(Modifier.padding(top = 4.dp)) {
                                 TextButton(onClick = viewModel::enhance) {
                                     Text("Mejorar calidad (H.265)")

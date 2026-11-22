@@ -57,6 +57,25 @@ class VideoEnhancer(private val context: Context) {
 
     private val aiUpscaler: AiUpscaler = NoopAiUpscaler()
 
+    /**
+     * True when the FFmpeg native libraries are actually present for this ABI.
+     * The ffmpeg-kit-video fork ships arm64-v8a and x86_64 only, so a 32-bit build
+     * (or an APK whose native libs were stripped) must degrade gracefully instead of
+     * hitting UnsatisfiedLinkError mid-transcode.
+     */
+    fun isAvailable(): Boolean = runCatching {
+        Class.forName("com.arthenica.ffmpegkit.FFmpegKit")
+        FFmpegKit.getFFmpegVersion() != null
+    }.getOrDefault(false)
+
+    companion object {
+        /** Cheap, cached answer for the UI so it can hide the "Mejorar" action. */
+        @Volatile private var availabilityCache: Boolean? = null
+        fun available(context: Context): Boolean =
+            availabilityCache ?: VideoEnhancer(context).isAvailable()
+                .also { availabilityCache = it }
+    }
+
     suspend fun enhance(
         input: File,
         output: File,
@@ -67,6 +86,7 @@ class VideoEnhancer(private val context: Context) {
     ): Result<EnhanceResult> = withContext(Dispatchers.IO) {
         runCatching {
             require(input.exists()) { "El archivo de origen no existe" }
+            check(isAvailable()) { "La mejora de video no está disponible en este dispositivo (ABI sin FFmpeg)" }
             val started = System.currentTimeMillis()
             val (srcW, srcH) = probeSize(input)
             val targetShort = when (preset) {

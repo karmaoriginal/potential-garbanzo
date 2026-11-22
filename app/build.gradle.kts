@@ -73,16 +73,21 @@ android {
         }
     }
 
-    // One APK per ABI keeps the download small (arm64-v8a covers virtually every phone
-    // from 2017 onwards; armeabi-v7a covers older devices and x86_64 covers emulators).
+    // One APK per ABI keeps the download small.
+    //
+    // Only 64-bit ABIs are shipped on purpose: the maintained FFmpegKit fork
+    // (dev.ffmpegkit-maintained) publishes native libraries for arm64-v8a and x86_64
+    // only. A 32-bit APK would silently lack libavcodec and the video enhancer would
+    // crash at runtime, so it is better not to offer one at all.
     splits {
         abi {
             isEnable = true
             reset()
-            include("arm64-v8a", "armeabi-v7a", "x86_64")
+            include("arm64-v8a", "x86_64")
             isUniversalApk = false
         }
     }
+
 
     // Baseline Profiles: shipped as an ART profile inside the APK, so Compose's
     // startup path is AOT-compiled and the first scroll does not stutter.

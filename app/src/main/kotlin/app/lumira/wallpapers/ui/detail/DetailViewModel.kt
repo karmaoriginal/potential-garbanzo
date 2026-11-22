@@ -31,6 +31,7 @@ data class DetailUiState(
     val downloading: Boolean = false,
     val downloadProgress: Float = 0f,
     val progress: Float = 0f,
+    val enhanceAvailable: Boolean = false,
     val message: String? = null,
 )
 
@@ -48,6 +49,11 @@ class DetailViewModel(app: Application) : AndroidViewModel(app) {
     val state: StateFlow<DetailUiState> = _state.asStateFlow()
 
     private var baseUrl: String = ""
+
+    init {
+        val available = app.lumira.wallpapers.enhance.VideoEnhancer.available(app)
+        _state.update { it.copy(enhanceAvailable = available) }
+    }
 
     fun load(wallpaperId: String?, catalogId: String?) = viewModelScope.launch {
         if (wallpaperId != null) {
