@@ -132,8 +132,20 @@ jobs:
           {
             echo "### Failed run [#${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
             echo
+            echo "Commit: \`${{ github.sha }}\`"
+            echo
+            echo '#### What went wrong'
             echo '```'
-            tail -c 16000 build.log 2>/dev/null || echo "build.log missing"
+            grep -E "What went wrong" -A 40 build.log 2>/dev/null | tail -60 || true
+            echo '```'
+            echo '#### Errors'
+            echo '```'
+            grep -E "^e: |^error:|^Caused by|^> Task .* FAILED|Could not (resolve|find|GET|download)|Script compilation errors|^[[:space:]]*e: file" \
+              build.log 2>/dev/null | head -80 || true
+            echo '```'
+            echo '#### Tail'
+            echo '```'
+            tail -c 6000 build.log 2>/dev/null || echo "build.log missing"
             echo '```'
           } > /tmp/comment.md
           gh issue comment "$ISSUE" --body-file /tmp/comment.md
