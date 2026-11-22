@@ -123,6 +123,24 @@ jobs:
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
+      - name: Publish APK inventory to ci-log issue
+        if: always() && steps.apks.outputs.found == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set +e
+          {
+            echo "### APK inventory (run #${{ github.run_number }})"
+            echo
+            echo '```'
+            for apk in dist/*.apk; do
+              echo "== $(basename "$apk") $(stat -c%s "$apk") bytes"
+              unzip -l "$apk" 'lib/*' 2>/dev/null | awk 'NF>=4 {print $1, $4}' | sort -rn | head -10
+            done
+            echo '```'
+          } > /tmp/inv.md
+          gh issue comment 1 --body-file /tmp/inv.md
+
       - name: Upload build log
         if: always()
         uses: actions/upload-artifact@v4
