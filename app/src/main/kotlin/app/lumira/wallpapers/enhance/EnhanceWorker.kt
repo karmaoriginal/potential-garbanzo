@@ -72,7 +72,7 @@ class EnhanceWorker(
         val canceled = AtomicBoolean(false)
 
         repo.setEnhanceState(id, "RUNNING", 0f)
-        val result: Result<EnhanceResult> = try {
+        val result: kotlin.Result<EnhanceResult> = try {
             VideoEnhancer(applicationContext).enhance(
                 input = input,
                 output = output,
@@ -88,7 +88,7 @@ class EnhanceWorker(
                 useAi = settings.aiUpscale,
             )
         } catch (t: Throwable) {
-            Result.failure<EnhanceResult>(t)
+            kotlin.Result.failure(t)
         }
 
         return when {

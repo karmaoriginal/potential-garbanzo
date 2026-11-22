@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 /**
@@ -178,6 +179,8 @@ dependencies {
     implementation(libs.androidx.profileinstaller)
 
     implementation(libs.okhttp)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.androidx.annotation)
     implementation(libs.kotlinx.coroutines.android)
 
     implementation(libs.coil.compose)

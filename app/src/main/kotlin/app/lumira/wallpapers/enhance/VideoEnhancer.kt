@@ -104,24 +104,30 @@ class VideoEnhancer(private val context: Context) {
             for (command in attempts) {
                 if (cancelFlag.get()) break
                 output.delete()
-                val session: FFmpegSession =
-                    FFmpegKit.executeWithArgumentsAsync(command, null, null, null) { }
-                // FFmpegKit reports the return code only once the session finished; the
-                // statistics callback keeps the progress bar alive meanwhile.
-                while (session.returnCode == null) {
+                val durationMs = probeDurationMs(workingInput)
+                val stats = java.util.concurrent.atomic.AtomicLong(-1L)
+                val completion = java.util.concurrent.CountDownLatch(1)
+                val session: FFmpegSession = FFmpegKit.executeWithArgumentsAsync(
+                    command,
+                    { completion.countDown() },
+                    { line -> lastLog = line ?: "" },
+                    { statistics -> stats.set(statistics?.getTime() ?: -1L) },
+                )
+                while (!completion.await(400, java.util.concurrent.TimeUnit.MILLISECONDS)) {
                     if (cancelFlag.get()) {
                         FFmpegKit.cancel(session.sessionId)
                         break
                     }
-                    val time = session.statistics?.time ?: -1L
-                    val duration = probeDurationMs(workingInput)
-                    if (time > 0 && duration > 0) {
-                        listener?.onProgress((time.toFloat() / duration).coerceIn(0f, 0.99f))
+                    val elapsed = stats.get()
+                    if (elapsed > 0 && durationMs > 0) {
+                        listener?.onProgress(
+                            (elapsed.toFloat() / durationMs.toFloat()).coerceIn(0f, 0.99f),
+                        )
                     }
-                    delay(400)
                 }
-                lastLog = session.output ?: ""
-                if (ReturnCode.isSuccess(session.returnCode) && output.exists() && output.length() > 0) {
+                if (cancelFlag.get()) break
+                lastLog = session.output?.takeLast(400) ?: lastLog
+                if (output.exists() && output.length() > 0) {
                     produced = output
                     break
                 }
