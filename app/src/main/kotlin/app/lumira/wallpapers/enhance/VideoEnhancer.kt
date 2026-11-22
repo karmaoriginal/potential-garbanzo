@@ -194,7 +194,8 @@ class VideoEnhancer(private val context: Context) {
         "-vf", filter,
         "-c:v", "hevc_mediacodec",
         "-b:v", "6M",
-        "-c:a", "copy",
+        // Never stream-copy audio: Vorbis/Opus sources (MKV/WebM) are not legal in MP4.
+        "-c:a", "aac", "-b:a", "128k",
         "-movflags", "+faststart",
         out.absolutePath,
     )
@@ -208,7 +209,7 @@ class VideoEnhancer(private val context: Context) {
         "-preset", "veryfast",
         "-crf", "26",
         "-tag:v", "hvc1",
-        "-c:a", "copy",
+        "-c:a", "aac", "-b:a", "128k",
         "-movflags", "+faststart",
         out.absolutePath,
     )

@@ -9,7 +9,6 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import app.lumira.wallpapers.LumiraApp
 import app.lumira.wallpapers.data.prefs.SettingsRepository
-import app.lumira.wallpapers.data.repo.WallpaperRepository
 import app.lumira.wallpapers.di.ServiceLocator
 import kotlinx.coroutines.flow.first
 import java.io.File
@@ -33,7 +32,6 @@ class CacheWorker(context: Context, params: WorkerParameters) : CoroutineWorker(
         val settings = SettingsRepository(context).settings.first()
         if (!settings.autoCleanCache) return Result.success()
 
-        val repo = ServiceLocator.wallpapers(context)
         val db = ServiceLocator.database(context)
 
         // 1. Trim the image cache down to the configured budget (oldest files first).
@@ -53,25 +51,34 @@ class CacheWorker(context: Context, params: WorkerParameters) : CoroutineWorker(
             if (file.lastModified() < staleCutoff) runCatching { file.delete() }
         }
 
-        // 4. Keep the cache directory bounded overall.
-        repo.clearCaches()
+        // 4. Bound the thumbnail directory too, but keep the 300 most recent ones:
+        //    deleting every thumbnail daily would force a full re-decode of the grid.
+        trimDirectory(thumbsDir, MAX_THUMB_BYTES, keepNewest = 300)
 
         return Result.success()
     }
 
-    private fun trimDirectory(dir: File, maxBytes: Long) {
+    /**
+     * Deletes the oldest files until the directory fits in [maxBytes] (and never
+     * touches the [keepNewest] most recent files).
+     */
+    private fun trimDirectory(dir: File, maxBytes: Long, keepNewest: Int = 0) {
         if (!dir.exists()) return
-        val files = dir.listFiles()?.filter { it.isFile }?.sortedBy { it.lastModified() } ?: return
-        var total = files.sumOf { it.length() }
-        for (file in files) {
-            if (total <= maxBytes) break
+        val oldestFirst = dir.listFiles()?.filter { it.isFile }?.sortedBy { it.lastModified() }
+            ?: return
+        var total = oldestFirst.sumOf { it.length() }
+        var remaining = oldestFirst.size
+        for (file in oldestFirst) {
+            if (total <= maxBytes || remaining <= keepNewest) break
             total -= file.length()
+            remaining--
             runCatching { file.delete() }
         }
     }
 
     companion object {
         private const val UNIQUE = "lumira_cache_cleanup"
+        private const val MAX_THUMB_BYTES = 48L * 1024 * 1024
 
         fun schedule(context: Context) {
             val request = PeriodicWorkRequestBuilder<CacheWorker>(1, TimeUnit.DAYS)
