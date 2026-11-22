@@ -3,7 +3,6 @@ package app.lumira.wallpapers
 import android.app.Application
 import androidx.work.Configuration
 import coil.ImageLoader
-import coil.Coil
 import coil.ImageLoaderFactory
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
@@ -31,22 +30,14 @@ import java.util.concurrent.TimeUnit
  */
 class LumiraApp : Application(), ImageLoaderFactory, Configuration.Provider {
 
-    private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-
     override fun onCreate() {
         super.onCreate()
         instance = this
         Notifications.ensureChannels(this)
         bootstrapBackgroundWork(this)
-
-        // Honour the user's cache budget: the ImageLoader starts with a sane default
-        // and is retuned as soon as DataStore emits the persisted value.
-        appScope.launch {
-            runCatching {
-                val settings = ServiceLocator.settings(this@LumiraApp).settings.first()
-                val bytes = settings.cacheLimitMb.toLong() * 1024 * 1024
-                Coil.imageLoader(this@LumiraApp).diskCache?.maxSizeBytes = bytes
-            }
+        // Warm DataStore off the main thread so the first screen reads settings instantly.
+        CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
+            runCatching { ServiceLocator.settings(this@LumiraApp).settings.first() }
         }
     }
 
@@ -57,9 +48,11 @@ class LumiraApp : Application(), ImageLoaderFactory, Configuration.Provider {
                 .build()
         }
         .diskCache {
+            // The default budget; CacheWorker trims it to the user's configured limit
+            // daily, and Settings exposes the limit for manual cleanup.
             DiskCache.Builder()
                 .directory(cacheDir.resolve("images"))
-                .maxSizeBytes(256L * 1024 * 1024)
+                .maxSizeBytes(DEFAULT_DISK_CACHE_BYTES)
                 .build()
         }
         .components {
@@ -79,6 +72,8 @@ class LumiraApp : Application(), ImageLoaderFactory, Configuration.Provider {
             .build()
 
     companion object {
+        private const val DEFAULT_DISK_CACHE_BYTES = 256L * 1024 * 1024
+
         lateinit var instance: LumiraApp
             private set
 
