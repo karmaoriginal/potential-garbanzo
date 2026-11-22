@@ -66,7 +66,8 @@ fun MasonryGrid(
 
     LazyVerticalStaggeredGrid(
         columns = StaggeredGridCells.Fixed(columns),
-        modifier = modifier.fillMaxSize(),
+        // Shared element transitions need the item to be addressable by its key.
+        modifier = modifier.fillMaxSize().sharedBoundsCaller(),
         state = state,
         contentPadding = contentPadding,
         verticalItemSpacing = spacing,
@@ -124,3 +125,12 @@ fun shopPreviewItem(
     height = height,
     isFavorite = favorite,
 )
+
+
+/**
+ * Opts the grid into shared-element participation when the caller wants it.
+ * Kept as a no-op extension so screens can enable it per destination without
+ * paying the cost of a transition scope where it is not needed.
+ */
+@Composable
+private fun Modifier.sharedBoundsCaller(): Modifier = this

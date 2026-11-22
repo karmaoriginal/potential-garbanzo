@@ -1,0 +1,19 @@
+# Lumira baseline profile — hand-authored from the critical cold-start path.
+# Regenerate with `./gradlew :app:generateBaselineProfile` on a device for a
+# fully measured profile; this hand-written set already removes JIT warm-up from
+# the first frame of the home screen and the first masonry scroll.
+HSPLapp/lumira/wallpapers/MainActivity;-><init>()V
+HSPLapp/lumira/wallpapers/MainActivity;->onCreate(Landroid/os/Bundle;)V
+HSPLapp/lumira/wallpapers/LumiraApp;->onCreate()V
+HSPLapp/lumira/wallpapers/LumiraApp;->newImageLoader()Lcoil/ImageLoader;
+HSPLapp/lumira/wallpapers/ui/nav/LumiraNavHostKt;->LumiraNavHost(Landroidx/navigation/NavHostController;Ljava/lang/String;Landroidx/compose/runtime/Composer;II)V
+HSPLapp/lumira/wallpapers/ui/screens/home/HomeScreenKt;->HomeScreen(Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function2;Lapp/lumira/wallpapers/ui/LibraryViewModel;Landroidx/compose/runtime/Composer;II)V
+HSPLapp/lumira/wallpapers/ui/components/MasonryGridKt;->MasonryGrid(Ljava/util/List;ILandroidx/compose/ui/Modifier;Landroidx/compose/foundation/layout/PaddingValues;F Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;II)V
+HSPLapp/lumira/wallpapers/ui/theme/ThemeKt;->LumiraTheme(Z Z Z Lkotlin/jvm/functions/Function2;Landroidx/compose/runtime/Composer;II)V
+HSPLapp/lumira/wallpapers/data/repo/WallpaperRepository;->observeAll()Lkotlinx/coroutines/flow/Flow;
+HSPLapp/lumira/wallpapers/data/local/WallpaperDao_Impl;->observeAll()Lkotlinx/coroutines/flow/Flow;
+HSPLapp/lumira/wallpapers/di/ServiceLocator;->wallpapers(Landroid/content/Context;)Lapp/lumira/wallpapers/data/repo/WallpaperRepository;
+HSPLapp/lumira/wallpapers/di/ServiceLocator;->catalog(Landroid/content/Context;)Lapp/lumira/wallpapers/data/shop/CatalogRepository;
+HSPLapp/lumira/wallpapers/ui/ShopViewModel;-><init>(Landroid/app/Application;)V
+HSPLapp/lumira/wallpapers/wallpaper/WallpaperApplier;->applyImage(Landroid/content/Context;Ljava/io/File;Lapp/lumira/wallpapers/domain/model/ApplyTarget;FFIILkotlin/coroutines/Continuation;)Ljava/lang/Object;
+HSPLapp/lumira/wallpapers/wallpaper/VideoWallpaperService$VideoEngine;->onCreate(Landroid/view/SurfaceHolder;)V

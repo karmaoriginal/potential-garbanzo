@@ -84,6 +84,10 @@ android {
         }
     }
 
+    // Baseline Profiles: shipped as an ART profile inside the APK, so Compose's
+    // startup path is AOT-compiled and the first scroll does not stutter.
+    sourceSets["main"].resources.srcDir("src/main/baseline-prof")
+
     androidResources {
         // Required by generateLocaleConfig; keeps per-app language settings working.
         generateLocaleConfig = true
