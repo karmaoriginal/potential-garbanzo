@@ -161,7 +161,7 @@ class WallpaperRepository(
 private fun WallpaperEntity.toDomain() = Wallpaper(
     id = id,
     title = title,
-    kind = runCatching { DomainKind.valueOf(kind) }.getOrDefault(DomainKind.IMAGE),
+    kind = runCatching { MediaKind.valueOf(kind) }.getOrDefault(MediaKind.IMAGE),
     source = runCatching { WallpaperSource.valueOf(source) }.getOrDefault(WallpaperSource.IMPORTED),
     localPath = filePath,
     thumbPath = thumbPath,

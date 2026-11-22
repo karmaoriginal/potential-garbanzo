@@ -52,10 +52,11 @@ class Downloader(
 
     private fun partDir(): File = File(context.filesDir, "downloads").apply { mkdirs() }
 
+    @JvmOverloads
     suspend fun download(
         item: CatalogItem,
         baseUrl: String,
-        onProgress: (DownloadProgress) -> Unit = {},
+        onProgress: ((DownloadProgress) -> Unit)? = null,
         isWifiOnly: Boolean = true,
     ): kotlin.Result<File> = withContext(Dispatchers.IO) {
         runCatching {
@@ -130,7 +131,7 @@ class Downloader(
                                 } else {
                                     0f
                                 }
-                                onProgress(DownloadProgress.Running(entityId, fraction, downloaded))
+                                onProgress?.invoke(DownloadProgress.Running(entityId, fraction, downloaded))
                             }
                         }
                     }
@@ -185,11 +186,11 @@ class Downloader(
                     status = "DONE",
                 ),
             )
-            onProgress(DownloadProgress.Done(entityId))
+            onProgress?.invoke(DownloadProgress.Done(entityId))
             finalFile
         }.onFailure { t ->
             Log.w("LumiraDownload", "download failed for ${item.id}", t)
-            onProgress(DownloadProgress.Failed("catalog_${item.id}", t.message ?: "Error"))
+            onProgress?.invoke(DownloadProgress.Failed("catalog_${item.id}", t.message ?: "Error"))
         }
     }
 

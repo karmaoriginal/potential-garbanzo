@@ -163,7 +163,7 @@ class ShopViewModel(app: Application) : AndroidViewModel(app) {
     fun download(item: CatalogItem) = viewModelScope.launch {
         val base = (catalogRepo.state.value as? CatalogState.Ready)?.catalog?.baseUrl ?: ""
         downloads.value = downloads.value + (item.id to 0f)
-        val result = downloader.download(item, base) { progress ->
+        val result = downloader.download(item, base, onProgress = { progress ->
             when (progress) {
                 is DownloadProgress.Running ->
                     downloads.value = downloads.value + (item.id to progress.fraction)
@@ -172,7 +172,7 @@ class ShopViewModel(app: Application) : AndroidViewModel(app) {
                 is DownloadProgress.Failed ->
                     downloads.value = downloads.value - item.id
             }
-        }
+        })
         if (result.isFailure) downloads.value = downloads.value - item.id
     }
 }

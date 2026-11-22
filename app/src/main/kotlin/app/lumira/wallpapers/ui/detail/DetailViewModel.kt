@@ -118,7 +118,7 @@ class DetailViewModel(app: Application) : AndroidViewModel(app) {
     fun download() = viewModelScope.launch {
         val item = _state.value.catalogItem ?: return@launch
         _state.update { it.copy(downloading = true, downloadProgress = 0f) }
-        val result = downloader.download(item, baseUrl) { progress ->
+        val result = downloader.download(item, baseUrl, onProgress = { progress ->
             when (progress) {
                 is DownloadProgress.Running ->
                     _state.update { it.copy(downloadProgress = progress.fraction) }
@@ -126,7 +126,7 @@ class DetailViewModel(app: Application) : AndroidViewModel(app) {
                 is DownloadProgress.Failed ->
                     _state.update { it.copy(message = progress.message) }
             }
-        }
+        })
         result.onSuccess { file ->
             val local = repo.get("catalog_${item.id}")
             _state.update {
