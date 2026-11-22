@@ -148,8 +148,9 @@ Room 2.6 (KSP) · DataStore · WorkManager · Media3 ExoPlayer 1.5 · Coil 2.7 (
 Elige **una** de estas vías:
 
 1. **Releases** (recomendado, versiones estables)
-   `https://github.com/karmaoriginal/potential-garbanzo/releases`
-   → descarga `app-arm64-v8a-release.apk` (casi cualquier móvil de 2017+).
+   **[github.com/karmaoriginal/potential-garbanzo/releases](https://github.com/karmaoriginal/potential-garbanzo/releases)**
+   → `Lumira v1.0.0` → descarga **`app-arm64-v8a-release.apk`** (27 MB, cualquier móvil de 2017+).
+   Para emuladores: `app-x86_64-release.apk` (31 MB).
 
 2. **GitHub Actions** (último build de `main`)
    `Actions → Build APK → último run verde → Artifacts → lumira-apk-<n>`
@@ -157,7 +158,9 @@ Elige **una** de estas vías:
 3. **Compilando tú mismo** (ver abajo).
 
 > Instalación: permite "instalar apps desconocidas" para tu navegador/gestor de archivos.
-> Requiere **Android 8.0 (API 26)** o superior.
+> Requiere **Android 8.0 (API 26)** de 64 bits (`arm64-v8a` o `x86_64`). Los APK existentes
+> están firmados con una clave efímera generada por CI: para actualizaciones limpias configura
+> los secrets de firma (ver *Compilar*).
 
 ---
 
@@ -244,6 +247,10 @@ El catálogo es **datos, no código**. Tres pasos:
    ```
 
    - `thumb`, `preview` y `full` pueden ser **relativos a `baseUrl`** o URLs absolutas.
+   El catálogo se publica en dos URLs equivalentes:
+   `raw.githubusercontent.com/…/main/docs/catalog/catalog.json` (por defecto en la app) y
+   `karmaoriginal.github.io/potential-garbanzo/catalog/catalog.json` (GitHub Pages, si está activo).
+   Si Pages no está habilitado en tu fork, activa *Settings → Pages → Deploy from a branch: main /docs*.
    - `kind`: `image` o `video`. `durationMs` solo aplica a videos.
    - La app indexa automáticamente `title`, `tags` y `category` en FTS para el buscador.
 
@@ -271,7 +278,8 @@ El catálogo es **datos, no código**. Tres pasos:
 ## 🙏 Créditos y licencias del contenido
 
 - **Arte y clips del catálogo**: originales, generados para Lumira y derivados procedurales.
-  Licencia **CC0 1.0 Universal** (dominio público).
+  Licencia **CC0 1.0 Universal** (dominio público). Archivos pesados en la release
+  [`catalog-v1`](https://github.com/karmaoriginal/potential-garbanzo/releases/tag/catalog-v1).
 - La app se apoya en proyectos de código abierto: **AndroidX / Jetpack Compose** (Apache-2.0),
   **Media3** (Apache-2.0), **Coil** (Apache-2.0), **OkHttp** (Apache-2.0),
   **kotlinx.serialization** (Apache-2.0), **Room** (Apache-2.0),
