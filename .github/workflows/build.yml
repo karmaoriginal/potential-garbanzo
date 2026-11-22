@@ -95,6 +95,27 @@ jobs:
             echo "found=false" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Report APK sizes and warnings
+        if: always()
+        run: |
+          set +e
+          {
+            echo "### Build summary (${{ github.sha }})"
+            echo
+            echo '#### APK sizes'
+            echo '```'
+            ls -lh dist 2>/dev/null || echo "no APKs"
+            echo '```'
+            echo '#### Kotlin warnings'
+            echo '```'
+            grep -E "^w: " build.log | sed -E 's#file:///[^ ]*/app/src#…/app/src#' | sort -u | head -80
+            echo '```'
+            echo '#### Tail'
+            echo '```'
+            tail -c 2500 build.log
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Upload build log
         if: always()
         uses: actions/upload-artifact@v4

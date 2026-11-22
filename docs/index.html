@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lumira · Catalog</title>
+  <style>
+    :root { color-scheme: dark; }
+    body { margin:0; font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+           background:#0B0B10; color:#E7E3EC; }
+    header { padding:56px 24px 24px; max-width:900px; margin:0 auto; }
+    h1 { font-size:44px; letter-spacing:-1.5px; margin:0 0 8px;
+         background:linear-gradient(90deg,#8B7BFF,#6FE7C4); -webkit-background-clip:text;
+         background-clip:text; color:transparent; }
+    p { color:#B9B3C6; line-height:1.6; }
+    a { color:#8B7BFF; }
+    main { max-width:900px; margin:0 auto; padding:0 24px 64px; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px; }
+    .card { border-radius:18px; overflow:hidden; background:#14141B; position:relative; aspect-ratio:9/16; }
+    .card img { width:100%; height:100%; object-fit:cover; display:block; }
+    .meta { font-size:12px; color:#B9B3C6; padding-top:6px; }
+    code { background:#1E1E28; padding:2px 6px; border-radius:6px; font-size:13px; }
+    .pill { display:inline-block; font-size:12px; padding:4px 10px; border-radius:999px;
+            background:#8B7BFF22; color:#C9C4D4; margin-right:6px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Lumira Catalog</h1>
+    <p>Catálogo curado de wallpapers estáticos y animados. Todo el contenido es
+       <strong>CC0-1.0</strong> (arte original de Lumira) y puede usarse libremente.</p>
+    <p>
+      <span class="pill">catalog.json</span>
+      <span class="pill">GitHub Pages</span>
+      <span class="pill">assets en Releases</span>
+    </p>
+    <p>Endpoint: <code id="url"></code></p>
+    <p><a href="./catalog/catalog.json">Ver catalog.json</a> ·
+       <a href="https://github.com/karmaoriginal/potential-garbanzo">Repositorio</a></p>
+  </header>
+  <main>
+    <div class="grid" id="grid"></div>
+  </main>
+  <script>
+    const url = new URL('./catalog/catalog.json', location.href).href;
+    document.getElementById('url').textContent = url;
+    fetch(url).then(r => r.json()).then(c => {
+      const grid = document.getElementById('grid');
+      c.items.forEach(item => {
+        const el = document.createElement('div');
+        el.innerHTML = `
+          <div class="card"><img loading="lazy" alt="${item.title}" src="${new URL('./catalog/' + item.thumb, location.href)}" /></div>
+          <div class="meta">${item.title} · ${item.kind === 'video' ? 'animado' : 'estático'}</div>`;
+        grid.appendChild(el);
+      });
+    }).catch(e => {
+      document.getElementById('grid').textContent = 'No se pudo cargar el catálogo: ' + e;
+    });
+  </script>
+</body>
+</html>

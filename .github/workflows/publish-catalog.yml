@@ -1,0 +1,86 @@
+name: Publish catalog
+
+# Publishes the shop catalog:
+#   1. uploads the heavy originals (JPG/MP4) to the `catalog-v1` GitHub Release,
+#   2. deploys docs/ (catalog.json + WebP thumbs + previews) to GitHub Pages.
+#
+# Run it manually after adding files to tools/catalog-src/ and regenerating docs/catalog/catalog.json.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - 'tools/catalog-src/**'
+      - 'docs/**'
+      - '.github/workflows/publish-catalog.yml'
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: publish-catalog
+  cancel-in-progress: false
+
+jobs:
+  assets:
+    name: Upload catalog assets to Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create release if missing
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release view catalog-v1 > /dev/null 2>&1 || \
+            gh release create catalog-v1 \
+              --title "Lumira catalog v1 · assets" \
+              --notes "Archivos pesados del catálogo (CC0-1.0). Solo se enlazan desde catalog.json."
+
+      - name: Upload with gh (built-in retries)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          gh release upload catalog-v1 tools/catalog-src/full/*.jpg tools/catalog-src/video/*.mp4 \
+            --clobber
+
+  pages:
+    name: Deploy catalog to GitHub Pages
+    runs-on: ubuntu-latest
+    needs: [ assets ]
+    outputs:
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+
+      - name: Deploy to Pages
+        id: deploy
+        uses: actions/deploy-pages@v4
+
+  verify:
+    name: Verify catalog is live
+    runs-on: ubuntu-latest
+    needs: [ pages ]
+    steps:
+      - name: Fetch catalog.json from Pages
+        run: |
+          set -uo pipefail
+          URL="https://karmaoriginal.github.io/potential-garbanzo/catalog/catalog.json"
+          for attempt in 1 2 3 4 5 6; do
+            CODE=$(curl -s -o /tmp/catalog.json -w "%{http_code}" "$URL" || true)
+            echo "attempt $attempt -> HTTP $CODE"
+            if [ "$CODE" = "200" ]; then
+              python3 -c "import json;d=json.load(open('/tmp/catalog.json'));print('items:',len(d['items']))"
+              break
+            fi
+            sleep 20
+          done
