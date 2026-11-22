@@ -114,7 +114,7 @@ class VideoEnhancer(private val context: Context) {
                         lastLog = line.message ?: ""
                     },
                     com.arthenica.ffmpegkit.StatisticsCallback { statistics ->
-                        stats.set(statistics.time)
+                        stats.set(statistics.time.toLong())
                     },
                 )
                 while (!completion.await(400, java.util.concurrent.TimeUnit.MILLISECONDS)) {
