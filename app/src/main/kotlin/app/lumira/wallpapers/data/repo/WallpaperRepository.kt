@@ -9,7 +9,7 @@ import app.lumira.wallpapers.data.media.MediaProbe
 import app.lumira.wallpapers.data.media.MediaFormats
 import app.lumira.wallpapers.data.media.dirSize
 import app.lumira.wallpapers.domain.model.LibraryStats
-import app.lumira.wallpapers.domain.model.MediaKind as DomainKind
+import app.lumira.wallpapers.domain.model.MediaKind
 import app.lumira.wallpapers.domain.model.Wallpaper
 import app.lumira.wallpapers.domain.model.WallpaperSource
 import app.lumira.wallpapers.util.FileStore

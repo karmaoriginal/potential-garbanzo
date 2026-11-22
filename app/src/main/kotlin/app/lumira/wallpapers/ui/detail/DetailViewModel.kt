@@ -4,7 +4,7 @@ import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import app.lumira.wallpapers.data.media.MediaKind
+import app.lumira.wallpapers.domain.model.MediaKind
 import app.lumira.wallpapers.data.shop.CatalogItem
 import app.lumira.wallpapers.data.shop.CatalogState
 import app.lumira.wallpapers.data.shop.DownloadProgress

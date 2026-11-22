@@ -57,7 +57,7 @@ class Downloader(
         baseUrl: String,
         onProgress: (DownloadProgress) -> Unit = {},
         isWifiOnly: Boolean = true,
-    ): Result<File> = withContext(Dispatchers.IO) {
+    ): kotlin.Result<File> = withContext(Dispatchers.IO) {
         runCatching {
             val settings = SettingsRepository(context).settings.first()
             if (isWifiOnly && settings.wifiOnly && !NetworkMonitor.isUnmetered(context)) {
