@@ -11,11 +11,6 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        // FFmpegKit (com.arthenica) is published here.
-        maven {
-            url = uri("https://api.arthenica.com/maven")
-            content { includeGroupByRegex("com\\.arthenica.*") }
-        }
     }
 }
 

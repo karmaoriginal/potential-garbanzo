@@ -186,7 +186,7 @@ dependencies {
     implementation(libs.media3.exoplayer)
     implementation(libs.media3.ui)
 
-    implementation(libs.ffmpeg.kit.min)
+    implementation(libs.ffmpeg.kit.video)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.junit)

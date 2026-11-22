@@ -24,6 +24,7 @@
 # ---- FFmpegKit ----
 -keep class com.arthenica.ffmpegkit.** { *; }
 -dontwarn com.arthenica.ffmpegkit.**
+-keep class com.ffmpegkit.** { *; }
 
 # ---- Wallpaper service must be instantiable by the system ----
 -keep class app.lumira.wallpapers.wallpaper.** { *; }
