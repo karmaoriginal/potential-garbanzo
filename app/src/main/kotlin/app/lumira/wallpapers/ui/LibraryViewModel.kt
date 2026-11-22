@@ -11,6 +11,7 @@ import app.lumira.wallpapers.wallpaper.ApplyResult
 import app.lumira.wallpapers.wallpaper.WallpaperApplier
 import app.lumira.wallpapers.domain.model.ApplyTarget
 import app.lumira.wallpapers.domain.model.QualityPreset
+import app.lumira.wallpapers.enhance.VideoEnhancer
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -159,7 +160,7 @@ class LibraryViewModel(app: Application) : AndroidViewModel(app) {
 
     fun scheduleEnhance(item: Wallpaper, preset: QualityPreset) = viewModelScope.launch {
         val context: Context = getApplication()
-        if (!app.lumira.wallpapers.enhance.VideoEnhancer.available(context)) {
+        if (!VideoEnhancer.available(context)) {
             _events.emit(
                 UiEvent.Message("La mejora de video no está disponible en este dispositivo"),
             )

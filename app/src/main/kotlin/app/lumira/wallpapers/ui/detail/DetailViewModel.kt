@@ -13,6 +13,7 @@ import app.lumira.wallpapers.domain.model.ApplyTarget
 import app.lumira.wallpapers.domain.model.QualityPreset
 import app.lumira.wallpapers.domain.model.Wallpaper
 import app.lumira.wallpapers.domain.model.WallpaperSource
+import app.lumira.wallpapers.enhance.VideoEnhancer
 import app.lumira.wallpapers.wallpaper.ApplyResult
 import app.lumira.wallpapers.wallpaper.WallpaperApplier
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -51,7 +52,7 @@ class DetailViewModel(app: Application) : AndroidViewModel(app) {
     private var baseUrl: String = ""
 
     init {
-        val available = app.lumira.wallpapers.enhance.VideoEnhancer.available(app)
+        val available = VideoEnhancer.available(app)
         _state.update { it.copy(enhanceAvailable = available) }
     }
 

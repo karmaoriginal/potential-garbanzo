@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.lumira.wallpapers.domain.model.MediaKind
 import app.lumira.wallpapers.domain.model.Wallpaper
+import app.lumira.wallpapers.enhance.VideoEnhancer
 import app.lumira.wallpapers.ui.LibraryFilter
 import app.lumira.wallpapers.ui.LibraryViewModel
 import app.lumira.wallpapers.ui.components.MasonryGrid
@@ -65,7 +66,7 @@ fun LibraryScreen(
     val state by viewModel.state.collectAsState()
     val context = androidx.compose.ui.platform.LocalContext.current
     val enhanceAvailable = remember(context) {
-        app.lumira.wallpapers.enhance.VideoEnhancer.available(context)
+        VideoEnhancer.available(context)
     }
     var actionTarget by remember { mutableStateOf<Wallpaper?>(null) }
     var renameTarget by remember { mutableStateOf<Wallpaper?>(null) }

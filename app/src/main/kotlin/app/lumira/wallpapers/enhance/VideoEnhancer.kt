@@ -4,6 +4,7 @@ import android.content.Context
 import android.media.MediaMetadataRetriever
 import app.lumira.wallpapers.domain.model.QualityPreset
 import com.arthenica.ffmpegkit.FFmpegKit
+import com.arthenica.ffmpegkit.FFmpegKitConfig
 import com.arthenica.ffmpegkit.FFmpegSession
 import com.arthenica.ffmpegkit.ReturnCode
 import kotlinx.coroutines.Dispatchers
@@ -65,7 +66,8 @@ class VideoEnhancer(private val context: Context) {
      */
     fun isAvailable(): Boolean = runCatching {
         Class.forName("com.arthenica.ffmpegkit.FFmpegKit")
-        FFmpegKit.getFFmpegVersion() != null
+        // Touching the native bridge throws UnsatisfiedLinkError when the ABI lacks libs.
+        FFmpegKitConfig.getVersion() != null
     }.getOrDefault(false)
 
     companion object {
