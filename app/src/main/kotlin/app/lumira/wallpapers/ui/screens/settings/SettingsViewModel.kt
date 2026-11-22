@@ -24,6 +24,7 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
 
     fun setDynamicColor(value: Boolean) = update { repo.setDynamicColor(value) }
     fun setAmoled(value: Boolean) = update { repo.setAmoled(value) }
+    fun setDarkMode(value: Settings.DarkMode) = update { repo.setDarkMode(value) }
     fun setGridColumns(value: Int) = update { repo.setGridColumns(value) }
     fun setLiveFps(value: Int) = update { repo.setLiveFps(value) }
     fun setLiveMuted(value: Boolean) = update { repo.setLiveMuted(value) }

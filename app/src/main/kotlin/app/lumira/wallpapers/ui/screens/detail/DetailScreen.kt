@@ -21,7 +21,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Favorite
@@ -144,7 +144,7 @@ fun DetailScreen(
                 .padding(horizontal = 8.dp, vertical = 6.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            ScrimIconButton(Icons.Filled.ArrowBack, "Atrás", onBack)
+            ScrimIconButton(Icons.AutoMirrored.Filled.ArrowBack, "Atrás", onBack)
             Spacer(Modifier.weight(1f))
             if (wallpaper != null) {
                 ScrimIconButton(

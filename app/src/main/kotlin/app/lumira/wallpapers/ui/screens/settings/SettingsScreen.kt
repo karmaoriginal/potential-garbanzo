@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -48,7 +48,7 @@ fun SettingsScreen(
         item {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = onBack) {
-                    Icon(Icons.Filled.ArrowBack, contentDescription = "Atrás")
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Atrás")
                 }
                 Text("Ajustes", style = MaterialTheme.typography.headlineSmall)
             }
@@ -63,6 +63,21 @@ fun SettingsScreen(
                     checked = settings.dynamicColor,
                     onCheckedChange = viewModel::setDynamicColor,
                 )
+                Text("Tema oscuro", style = MaterialTheme.typography.bodyMedium)
+                SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+                    val modes = listOf(
+                        Settings.DarkMode.SYSTEM to "Sistema",
+                        Settings.DarkMode.LIGHT to "Claro",
+                        Settings.DarkMode.DARK to "Oscuro",
+                    )
+                    modes.forEachIndexed { index, (mode, label) ->
+                        SegmentedButton(
+                            selected = settings.darkMode == mode,
+                            onClick = { viewModel.setDarkMode(mode) },
+                            shape = SegmentedButtonDefaults.itemShape(index, modes.size),
+                        ) { Text(label) }
+                    }
+                }
                 SwitchRow(
                     title = "Modo AMOLED",
                     subtitle = "Negro puro en superficies oscuras",
