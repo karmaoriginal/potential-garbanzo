@@ -80,8 +80,7 @@ jobs:
         id: build
         run: |
           set -o pipefail
-          ./gradlew --no-daemon --stacktrace assembleRelease \
-            -x lintVitalRelease 2>&1 | tee build.log
+          ./gradlew --no-daemon --stacktrace assembleRelease 2>&1 | tee build.log
 
       - name: Collect APKs
         id: apks
