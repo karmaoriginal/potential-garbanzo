@@ -170,6 +170,27 @@ jobs:
           } > /tmp/comment.md
           gh issue comment "$ISSUE" --body-file /tmp/comment.md
 
+      - name: Publish build summary to ci-log issue
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set +e
+          SIZES=$(ls -lh dist 2>/dev/null | tail -n +2 | awk '{print $9": "$5}' | paste -sd' | ')
+          WARNINGS=$(grep -cE "^w: " build.log 2>/dev/null || echo 0)
+          {
+            echo "### OK run [#${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+            echo
+            echo "- commit: \`${{ github.sha }}\`"
+            echo "- APKs: $SIZES"
+            echo "- kotlin warnings: $WARNINGS"
+            echo
+            echo '```'
+            grep -E "^w: " build.log | sed -E 's#file:///[^ ]*/app/src#…/app/src#' | sort -u | head -40
+            echo '```'
+          } > /tmp/ok.md
+          gh issue comment 1 --body-file /tmp/ok.md
+
       - name: Publish GitHub Release (tags only)
         if: startsWith(github.ref, 'refs/tags/v') && steps.apks.outputs.found == 'true'
         uses: softprops/action-gh-release@v2
