@@ -106,6 +106,13 @@ jobs:
             echo '```'
             ls -lh dist 2>/dev/null || echo "no APKs"
             echo '```'
+            echo '#### Native libs per APK (top 12 by size)'
+            echo '```'
+            for apk in dist/*.apk; do
+              echo "== $(basename "$apk")"
+              unzip -l "$apk" 'lib/*' 2>/dev/null | awk '{print $1, $4}' | sort -rn | head -12
+            done
+            echo '```'
             echo '#### Kotlin warnings'
             echo '```'
             grep -E "^w: " build.log | sed -E 's#file:///[^ ]*/app/src#…/app/src#' | sort -u | head -80
