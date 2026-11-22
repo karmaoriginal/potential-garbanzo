@@ -1,0 +1,128 @@
+name: Build APK
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+  workflow_dispatch:
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Assemble release APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Set up Gradle (with cache)
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: false
+          gradle-home-cache-cleanup: true
+
+      - name: Generate signing keystore
+        id: keystore
+        run: |
+          set -euo pipefail
+          if [ -n "${{ secrets.KEYSTORE_BASE64 }}" ]; then
+            echo "Using keystore from repository secrets."
+            echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > "$RUNNER_TEMP/release.jks"
+            echo "store=$RUNNER_TEMP/release.jks" >> "$GITHUB_OUTPUT"
+            {
+              echo "LUMIRA_KEYSTORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}"
+              echo "LUMIRA_KEY_ALIAS=${{ secrets.KEY_ALIAS }}"
+              echo "LUMIRA_KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}"
+            } >> "$GITHUB_ENV"
+          else
+            echo "No secrets found - generating an ephemeral keystore."
+            keytool -genkeypair -v \
+              -keystore "$RUNNER_TEMP/release.jks" \
+              -storetype JKS \
+              -alias lumira \
+              -keyalg RSA -keysize 4096 -validity 10000 \
+              -storepass lumira-ci -keypass lumira-ci \
+              -dname "CN=Lumira, OU=CI, O=Lumira, L=NA, S=NA, C=NA"
+            echo "store=$RUNNER_TEMP/release.jks" >> "$GITHUB_OUTPUT"
+            {
+              echo "LUMIRA_KEYSTORE_PASSWORD=lumira-ci"
+              echo "LUMIRA_KEY_ALIAS=lumira"
+              echo "LUMIRA_KEY_PASSWORD=lumira-ci"
+            } >> "$GITHUB_ENV"
+          fi
+          echo "LUMIRA_KEYSTORE_FILE=$RUNNER_TEMP/release.jks" >> "$GITHUB_ENV"
+
+      - name: Build release APKs
+        id: build
+        run: |
+          set -o pipefail
+          ./gradlew --no-daemon --stacktrace assembleRelease \
+            -x lintVitalRelease 2>&1 | tee build.log
+
+      - name: Upload build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log-${{ github.run_attempt }}
+          path: build.log
+          retention-days: 14
+          if-no-files-found: warn
+
+      - name: Collect APKs
+        id: apks
+        if: always()
+        run: |
+          mkdir -p dist
+          if [ -d app/build/outputs/apk/release ]; then
+            cp app/build/outputs/apk/release/*.apk dist/ 2>/dev/null || true
+          fi
+          if [ -d app/build/outputs/apk/debug ]; then
+            cp app/build/outputs/apk/debug/*.apk dist/ 2>/dev/null || true
+          fi
+          ls -l dist || true
+          if [ -n "$(ls -A dist 2>/dev/null)" ]; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Upload APK artifacts
+        if: always() && steps.apks.outputs.found == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: lumira-apk-${{ github.run_number }}
+          path: dist/*.apk
+          retention-days: 30
+          if-no-files-found: error
+
+      - name: Publish GitHub Release (tags only)
+        if: startsWith(github.ref, 'refs/tags/v') && steps.apks.outputs.found == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Lumira ${{ github.ref_name }}
+          files: dist/*.apk
+          generate_release_notes: true
+          body: |
+            ## Lumira ${{ github.ref_name }}
+
+            Wallpapers estáticos y animados, con biblioteca propia y tienda curada.
+
+            Descarga el APK `arm64-v8a` para casi cualquier teléfono moderno.
+            También se incluyen `armeabi-v7a` (dispositivos antiguos) y `x86_64` (emuladores).
