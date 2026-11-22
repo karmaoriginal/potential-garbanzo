@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Lumira</string>
+    <string name="live_wallpaper_description">Wallpapers animados de Lumira con ExoPlayer</string>
+</resources>

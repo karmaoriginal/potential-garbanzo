@@ -72,6 +72,8 @@ android {
         }
     }
 
+    // One APK per ABI keeps the download small (arm64-v8a covers virtually every phone
+    // from 2017 onwards; armeabi-v7a covers older devices and x86_64 covers emulators).
     splits {
         abi {
             isEnable = true
@@ -79,6 +81,11 @@ android {
             include("arm64-v8a", "armeabi-v7a", "x86_64")
             isUniversalApk = false
         }
+    }
+
+    androidResources {
+        // Required by generateLocaleConfig; keeps per-app language settings working.
+        generateLocaleConfig = true
     }
 
     compileOptions {
@@ -89,11 +96,6 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
-    }
-
-    androidResources {
-        // APK size: only keep what the app actually needs.
-        generateLocaleConfig = true
     }
 
     packaging {
