@@ -110,8 +110,12 @@ class VideoEnhancer(private val context: Context) {
                 val session: FFmpegSession = FFmpegKit.executeWithArgumentsAsync(
                     command,
                     { completion.countDown() },
-                    { line -> lastLog = line ?: "" },
-                    { statistics -> stats.set(statistics?.getTime() ?: -1L) },
+                    com.arthenica.ffmpegkit.LogCallback { line ->
+                        lastLog = line.message ?: ""
+                    },
+                    com.arthenica.ffmpegkit.StatisticsCallback { statistics ->
+                        stats.set(statistics.time)
+                    },
                 )
                 while (!completion.await(400, java.util.concurrent.TimeUnit.MILLISECONDS)) {
                     if (cancelFlag.get()) {
