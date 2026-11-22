@@ -399,7 +399,9 @@ private fun BigButton(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
         ) {
-            androidx.compose.material3.LocalContentColor provides MaterialTheme.colorScheme.onPrimary, icon()
+            androidx.compose.runtime.CompositionLocalProvider(
+                androidx.compose.material3.LocalContentColor provides MaterialTheme.colorScheme.onPrimary,
+            ) { icon() }
             Spacer(Modifier.size(8.dp))
             Text(
                 label,
