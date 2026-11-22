@@ -15,6 +15,7 @@ import app.lumira.wallpapers.di.ServiceLocator
 import app.lumira.wallpapers.enhance.Notifications
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
@@ -41,10 +42,8 @@ class LumiraApp : Application(), ImageLoaderFactory, Configuration.Provider {
         // and is retuned as soon as DataStore emits the persisted value.
         appScope.launch {
             runCatching {
-                val settings = ServiceLocator.settings(this@LumiraApp).settings
-                kotlinx.coroutines.flow.first(settings)
-                    .let { it.cacheLimitMb.toLong() * 1024 * 1024 }
-                    .also { bytes -> imageLoader.diskCache?.maxSizeBytes = bytes }
+                val settings = ServiceLocator.settings(this@LumiraApp).settings.first()
+                imageLoader.diskCache?.maxSizeBytes = settings.cacheLimitMb.toLong() * 1024 * 1024
             }
         }
     }
