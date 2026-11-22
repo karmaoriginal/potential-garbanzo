@@ -5,7 +5,6 @@ import android.net.Uri
 import app.lumira.wallpapers.data.local.DownloadEntity
 import app.lumira.wallpapers.data.local.LumiraDatabase
 import app.lumira.wallpapers.data.local.WallpaperEntity
-import app.lumira.wallpapers.data.media.MediaKind
 import app.lumira.wallpapers.data.media.MediaProbe
 import app.lumira.wallpapers.data.media.MediaFormats
 import app.lumira.wallpapers.data.media.dirSize

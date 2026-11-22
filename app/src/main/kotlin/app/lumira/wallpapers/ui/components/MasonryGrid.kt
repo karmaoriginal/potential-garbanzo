@@ -22,6 +22,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import app.lumira.wallpapers.domain.model.Wallpaper
+import app.lumira.wallpapers.domain.model.MediaKind
 
 /**
  * Masonry grid of wallpapers.
@@ -113,9 +114,9 @@ fun shopPreviewItem(
     id = id,
     title = title,
     kind = if (kind.equals("video", true)) {
-        app.lumira.wallpapers.data.media.MediaKind.VIDEO
+        app.lumira.wallpapers.domain.model.MediaKind.VIDEO
     } else {
-        app.lumira.wallpapers.data.media.MediaKind.IMAGE
+        app.lumira.wallpapers.domain.model.MediaKind.IMAGE
     },
     source = app.lumira.wallpapers.domain.model.WallpaperSource.DOWNLOADED,
     remoteThumb = thumbUrl,

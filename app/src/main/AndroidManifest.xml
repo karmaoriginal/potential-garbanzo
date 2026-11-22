@@ -22,14 +22,14 @@
         android:largeHeap="false"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Lumira.Starting"
+        android:theme="@style/Theme.Lumira"
         tools:targetApi="34">
 
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:launchMode="singleTop"
-            android:theme="@style/Theme.Lumira.Starting"
+            android:theme="@style/Theme.Lumira"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

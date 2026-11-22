@@ -5,8 +5,8 @@ import android.net.Uri
 import android.os.Environment
 import android.provider.OpenableColumns
 import app.lumira.wallpapers.data.media.MediaFormats
-import app.lumira.wallpapers.data.media.MediaKind
 import java.io.File
+import app.lumira.wallpapers.domain.model.MediaKind
 
 /**
  * App-private storage layout. Everything lives under

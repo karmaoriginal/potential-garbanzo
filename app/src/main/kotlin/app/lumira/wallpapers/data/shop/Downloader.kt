@@ -22,6 +22,7 @@ import java.io.File
 import java.io.RandomAccessFile
 import java.net.HttpURLConnection
 import java.util.concurrent.TimeUnit
+import app.lumira.wallpapers.domain.model.MediaKind
 
 /** Progress event for a single download. */
 sealed interface DownloadProgress {
@@ -73,9 +74,9 @@ class Downloader(
             }
 
             val ext = FileStore.extensionFor(null, File(url).name, if (item.isVideo) {
-                app.lumira.wallpapers.data.media.MediaKind.VIDEO
+                app.lumira.wallpapers.domain.model.MediaKind.VIDEO
             } else {
-                app.lumira.wallpapers.data.media.MediaKind.IMAGE
+                app.lumira.wallpapers.domain.model.MediaKind.IMAGE
             })
             val part = File(partDir(), "$entityId.$ext.part")
             val finalFile = FileStore.mediaFile(context, "$entityId.$ext")

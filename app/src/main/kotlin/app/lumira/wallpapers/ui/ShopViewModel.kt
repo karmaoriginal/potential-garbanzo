@@ -56,13 +56,20 @@ class ShopViewModel(app: Application) : AndroidViewModel(app) {
 
     private var searchJob: Job? = null
 
+    private val filterKey = combine(query, category, sort, media) { q, c, s, m ->
+        FilterKey(q, c, s, m)
+    }
+    private val searchAndDownloads = combine(searchIds, downloads) { ids, d -> ids to d }
+
     val state: StateFlow<ShopUiState> = combine(
         catalogRepo.state,
         catalogRepo.signals(),
-        combine(query, category, sort, media) { q, c, s, m -> FilterKey(q, c, s, m) },
+        filterKey,
         favoritesOnly,
-        combine(searchIds, downloads) { ids, d -> ids to d },
-    ) { catalogState, signals, key, favOnly, (ids, dl) ->
+        searchAndDownloads,
+    ) { catalogState, signals, key, favOnly, idsAndDownloads ->
+        val ids = idsAndDownloads.first
+        val dl = idsAndDownloads.second
         val all = (catalogState as? CatalogState.Ready)?.catalog?.items ?: emptyList()
         val filtered = all.asSequence()
             .filter { item ->

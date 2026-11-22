@@ -4,7 +4,6 @@ import android.app.Application
 import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import app.lumira.wallpapers.data.media.MediaKind
 import app.lumira.wallpapers.di.ServiceLocator
 import app.lumira.wallpapers.domain.model.LibraryStats
 import app.lumira.wallpapers.domain.model.Wallpaper
@@ -23,6 +22,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.io.File
+import app.lumira.wallpapers.domain.model.MediaKind
 
 /** Library tab selection. */
 enum class LibraryFilter(val label: String) {

@@ -7,6 +7,7 @@ import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.util.Size
 import androidx.exifinterface.media.ExifInterface
+import app.lumira.wallpapers.domain.model.MediaKind
 import java.io.File
 
 /** Basic media facts used by the importer, enhancer and UI. */
@@ -27,8 +28,6 @@ data class MediaInfo(
             MediaKind.VIDEO -> shortSide < 720 || (bitrate in 1..1_400_000 && durationMs > 0)
         }
 }
-
-enum class MediaKind { IMAGE, VIDEO }
 
 /** File format support matrix (verified against the platform decoders on API 26+). */
 object MediaFormats {

@@ -34,8 +34,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
-import app.lumira.wallpapers.data.media.MediaKind
 import app.lumira.wallpapers.domain.model.Wallpaper
+import app.lumira.wallpapers.domain.model.MediaKind
 
 /**
  * The card used in every masonry grid.
