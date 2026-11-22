@@ -60,7 +60,7 @@ class CatalogRepository(
     private val etagFile get() = File(context.filesDir, "catalog_cache.etag")
 
     suspend fun load(forceRefresh: Boolean = false): CatalogState = withContext(Dispatchers.IO) {
-        val cached = readCache()
+        val cached = readCache() ?: readBundled()
         if (cached != null && !forceRefresh) {
             _state.value = CatalogState.Ready(cached, fromCache = true)
             // Background refresh; failure keeps the cached copy visible.
@@ -69,6 +69,7 @@ class CatalogRepository(
         }
         _state.value = CatalogState.Loading
         val refreshed = refresh(cached)
+        if (refreshed == null) indexForSearch(cached)
         _state.value = refreshed ?: cached?.let { CatalogState.Ready(it, fromCache = true) }
             ?: CatalogState.Error("No se pudo cargar el catálogo. Revisa tu conexión.")
         _state.value
@@ -84,7 +85,9 @@ class CatalogRepository(
             if (!response.isSuccessful) error("HTTP ${response.code}")
             val body = response.body?.string() ?: error("Respuesta vacía")
             val catalog = json.decodeFromString<Catalog>(body)
-            cacheFile.writeText(body)
+            if (catalog.items.none { it.thumb.startsWith("data:") }) {
+                cacheFile.writeText(body)
+            }
             response.header("ETag")?.let { etagFile.writeText(it) }
             indexForSearch(catalog)
             CatalogState.Ready(catalog, fromCache = false)
@@ -96,7 +99,21 @@ class CatalogRepository(
         json.decodeFromString<Catalog>(cacheFile.readText())
     }.getOrNull()
 
-    private suspend fun indexForSearch(catalog: Catalog) {
+    /**
+     * Offline seed shipped inside the APK (assets/catalog/bundled.json).
+     *
+     * It carries the same metadata as the published catalog but embeds tiny base64
+     * thumbnails, so the shop is fully browsable on first launch without network or
+     * without GitHub Pages being reachable. `full` URLs still point at GitHub Releases.
+     */
+    private fun readBundled(): Catalog? = runCatching {
+        context.assets.open("catalog/bundled.json").use { stream ->
+            json.decodeFromString<Catalog>(stream.readBytes().decodeToString())
+        }
+    }.getOrNull()
+
+    private suspend fun indexForSearch(catalog: Catalog?) {
+        if (catalog == null) return
         val dao = db.catalogFts()
         if (dao.count() == catalog.items.size) return
         dao.clear()

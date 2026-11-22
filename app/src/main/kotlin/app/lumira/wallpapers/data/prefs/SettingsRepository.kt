@@ -47,9 +47,16 @@ data class Settings(
     enum class DarkMode { SYSTEM, LIGHT, DARK }
 
     companion object {
-        /** GitHub Pages URL of the versioned catalog. Update on fork/redeploy. */
+        /**
+         * Canonical, version-agnostic URL of the catalog.
+         *
+         * `raw.githubusercontent.com` is used as the default because it works as soon as
+         * the repository is public and never breaks when Pages is (re)deployed. If Pages
+         * is enabled, `https://karmaoriginal.github.io/potential-garbanzo/catalog/catalog.json`
+         * is an equivalent CDN-backed alternative (see README → Tienda).
+         */
         const val DEFAULT_CATALOG_URL =
-            "https://karmaoriginal.github.io/potential-garbanzo/catalog.json"
+            "https://raw.githubusercontent.com/karmaoriginal/potential-garbanzo/main/docs/catalog/catalog.json"
     }
 }
 
